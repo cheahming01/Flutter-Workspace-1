@@ -259,5 +259,5 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
   void initState() {
     super.initState();
     getCountryInfo();
-  }
+  } 
 }
