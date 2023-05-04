@@ -23,9 +23,10 @@ class MainApp extends StatefulWidget {
 }
 
 class _MainAppState extends State<MainApp> {
+  
   final TextEditingController uCountry = TextEditingController();
   String _message = '';
-
+  
   void _sendMessage() {
     if (uCountry.text.isEmpty) {
       setState(() {
@@ -113,7 +114,7 @@ class ZoomedBackgroundPage extends StatefulWidget {
 }
 
 class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
-  var desc = "No Data";
+  var desc = "\nNo Data";
   var fullDescExpanded = false;
   var countryName = '';
   var currencyName = '';
@@ -148,7 +149,7 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
                   },
                 ),
                 Text(
-                  'You searched for: ${widget.countryName}',
+                  '"${widget.countryName}"',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 30,
@@ -159,12 +160,12 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
                   duration: const Duration(milliseconds: 300),
                   firstChild: Text(
                     desc,
-                    maxLines: 3,
+                    maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w300,
-                        color: Colors.black),
+                        color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                   secondChild: Text(
@@ -172,7 +173,7 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
                     style: const TextStyle(
                         fontSize: 25,
                         fontWeight: FontWeight.w300,
-                        color: Colors.black),
+                        color: Colors.white),
                     textAlign: TextAlign.center,
                   ),
                   crossFadeState: fullDescExpanded
@@ -215,9 +216,13 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
 
   Future<void> getCountryInfo() async {
     String country = widget.countryName;
-    var apiid = "yVlcH/OrWZD64h0GVdqYMw==39SD9Uv27UV9r2Kr";
-    Uri url = Uri.parse('https://api.api-ninjas.com/v1/country?name=$country');
-    var response = await http.get(url, headers: {"X-Api-Key": apiid});
+    http.Response response = await http.get(
+      Uri.parse('https://api.api-ninjas.com/v1/country?name=$country'),
+      headers: {
+        'X-Api-Key': 'yVlcH/OrWZD64h0GVdqYMw==39SD9Uv27UV9r2Kr',
+      },
+    );
+
 
     if (response.statusCode == 200) {
       var jsonData = response.body;
@@ -231,7 +236,7 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
         countryRegion = parsedJson[0]['region'];
         setState(() {
           desc =
-              "Country Name: $countryName. \n Capital: $countryCapital, $countryRegion. \n Official Currenncy: $currencyName($currencyCode)";
+              "\nCapital: $countryCapital, $countryRegion. \n Official Currenncy: $currencyName($currencyCode)";
           countryFlag =
               NetworkImage('https://flagsapi.com/$countryIso/shiny/64.png');
         });
@@ -249,5 +254,10 @@ class _ZoomedBackgroundPageState extends State<ZoomedBackgroundPage> {
             'https://icon-library.com/images/no-data-icon/no-data-icon-5.jpg');
       });
     }
+  }
+  @override
+  void initState() {
+    super.initState();
+    getCountryInfo();
   }
 }
