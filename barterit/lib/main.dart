@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Barter It',
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primarySwatch: Colors.blue,
         textTheme: GoogleFonts.aBeeZeeTextTheme(
           Theme.of(context)
               .textTheme, // If this is not set, then ThemeData.light().textTheme is used.

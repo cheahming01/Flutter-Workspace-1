@@ -1,9 +1,10 @@
+import 'package:barterit/views/screens/imagepickerpage.dart';
 import 'package:barterit/views/screens/profiletabscreen.dart';
 import 'package:flutter/material.dart';
 
 import '../../models/user.dart';
 import 'buyertabscreen.dart';
-import 'newitemtabscreen.dart';
+import 'newpossessiontabscreen.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -84,7 +85,7 @@ class _MainScreenState extends State<MainScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (content) => NewItemTabScreen(user: widget.user)));
+                  builder: (content) => ImagePickerPage(user: widget.user)));
         },
         child: Icon(Icons.add),
       ),

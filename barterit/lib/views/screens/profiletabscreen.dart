@@ -1,3 +1,6 @@
+import 'package:barterit/views/screens/historypage.dart';
+import 'package:barterit/views/screens/publishedpage.dart';
+import 'package:barterit/views/screens/storagepage.dart';
 import 'package:flutter/material.dart';
 import 'package:barterit/models/user.dart';
 import 'package:barterit/views/screens/loginscreen.dart';
@@ -16,11 +19,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
   late double screenHeight, screenWidth;
   bool loginRequired = false;
   bool dialogShown = false;
+  int currentPageIndex = 0;
+  late PageController _pageController;
 
   @override
   void initState() {
     super.initState();
-    print("Profile");
+    _pageController = PageController(initialPage: currentPageIndex);
   }
 
   @override
@@ -92,12 +97,45 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
       }
     });
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Profile"),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.zero,
+              ),
+            ),
+            backgroundColor: MaterialStateProperty.resolveWith<Color?>(
+              (Set<MaterialState> states) {
+                if (states.contains(MaterialState.pressed)) {
+                  return null;
+                } else {
+                  return null;
+                }
+              },
+            ),
+          ),
+        ),
       ),
-      body: Center(
-        child: Column(
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text("Profile"),
+          automaticallyImplyLeading: false,
+          actions: [
+            IconButton(
+              icon: Icon(Icons.logout),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),
+                );
+              },
+            ),
+          ],
+        ),
+        body: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(8),
@@ -105,7 +143,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
               width: screenWidth,
               child: Card(
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Container(
                       margin: EdgeInsets.all(4),
@@ -130,44 +168,77 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 ),
               ),
             ),
-            Container(
-              width: screenWidth,
-              alignment: Alignment.center,
-              color: Theme.of(context).colorScheme.background,
-              child: const Padding(
-                padding: EdgeInsets.fromLTRB(0, 2, 0, 2),
-                child: Text(
-                  "PROFILE SETTINGS",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+            Material(
+              child: Container(
+                height: screenHeight * 0.05,
+                alignment: Alignment.center,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            currentPageIndex = 0;
+                          });
+                          _pageController.animateToPage(0,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease);
+                        },
+                        child: Text("Published"),
+                      ),
+                    ),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            currentPageIndex = 1;
+                          });
+                          _pageController.animateToPage(1,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease);
+                        },
+                        child: Text("Storage"),
+                      ),
+                    ),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            currentPageIndex = 2;
+                          });
+                          _pageController.animateToPage(2,
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease);
+                        },
+                        child: Text("History"),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
             Expanded(
-              child: ListView(
-                children: [
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => LoginScreen()),
-                      );
-                    },
-                    child: Text("LOGIN"),
-                  ),
-                  MaterialButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegistrationScreen()),
-                      );
-                    },
-                    child: Text("REGISTRATION"),
-                  ),
-                ],
+              child: PageView.builder(
+                controller: _pageController, 
+                onPageChanged: (index) {
+                  setState(() {
+                    currentPageIndex = index;
+                  });
+                },
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  switch (index) {
+                    case 0:
+                      return PublishedPage();
+                    case 1:
+                      return StoragePage();
+                    case 2:
+                      return HistoryPage();
+                    default:
+                      return PublishedPage(); 
+                  }
+                },
               ),
             ),
           ],
