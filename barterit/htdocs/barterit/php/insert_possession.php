@@ -17,9 +17,15 @@ $longitude = $_POST['longitude'];
 $state = $_POST['state'];
 $locality = $_POST['locality'];
 $images = $_POST['images'];
-$trade_option = json_decode($_POST['trade_option']);
+$cash_checked = $_POST['cash_checked'] == 'true' ? 1 : 0;
+$goods_checked = $_POST['goods_checked'] == 'true' ? 1 : 0;
+$services_checked = $_POST['services_checked'] == 'true' ? 1 : 0;
+$other_checked = $_POST['other_checked'] == 'true' ? 1 : 0;
 
-$sqlinsert = "INSERT INTO `tbl_possessions`(`user_id`, `possession_name`, `possession_type`, `possession_desc`, `latitude`, `longitude`, `state`, `locality`, `trade_option`, `date_owned`) VALUES ('$userid','$possession_name','$possession_type','$possession_desc','$latitude','$longitude','$state','$locality','$trade_option','$date_owned')";
+$sqlinsert = "INSERT INTO `tbl_possessions`(`user_id`, `possession_name`, `possession_type`, `possession_desc`, `latitude`, `longitude`, `state`, `locality`, `date_owned`, `cash_checked`, `goods_checked`, `services_checked`, `other_checked`) VALUES ('$userid','$possession_name','$possession_type','$possession_desc','$latitude','$longitude','$state','$locality','$date_owned','$cash_checked','$goods_checked','$services_checked','$other_checked')";
+
+
+echo "SQL Query: " . $sqlinsert . PHP_EOL;
 
 if ($conn->query($sqlinsert) === TRUE) {
 	$foldername = mysqli_insert_id($conn);
@@ -27,9 +33,15 @@ if ($conn->query($sqlinsert) === TRUE) {
 	$filename++;
 	$response = array('status' => 'success', 'data' => null);
 	$decoded_string = base64_decode($images);
-	$path = "../assets/possessions/$foldername/".$filename.".png";
-	file_put_contents($path, $decoded_string);
-    sendJsonResponse($response);
+	$directory = "../assets/possessions/$foldername";
+	// Create the directory if it doesn't exist
+    	if (!is_dir($directory)) {
+        	mkdir($directory, 0777, true);
+    	}
+    
+    	$path = "$directory/$filename.png";
+    	file_put_contents($path, $decoded_string);
+    	sendJsonResponse($response);
 } else {
 	$response = array('status' => 'failed', 'data' => null);
 	sendJsonResponse($response);
