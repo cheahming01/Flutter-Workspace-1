@@ -131,7 +131,7 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                                   width: screenWidth,
                                   fit: BoxFit.cover,
                                   imageUrl:
-                                      "${MyConfig().SERVER}/barterit/assets/possessions/${possessionList[index].possessionId}/2.png",
+                                      "${MyConfig().SERVER}/barterit/assets/possessions/${possessionList[index].possessionId}/1.png",
                                   placeholder: (context, url) =>
                                       const LinearProgressIndicator(),
                                   errorWidget: (context, url, error) =>

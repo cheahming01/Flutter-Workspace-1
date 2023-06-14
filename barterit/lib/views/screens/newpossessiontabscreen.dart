@@ -14,7 +14,7 @@ class NewPossessionTabScreen extends StatefulWidget {
   final List<File?> images;
 
   const NewPossessionTabScreen(
-      {super.key, required this.user, required this.images});
+      {Key? key, required this.user, required this.images});
 
   @override
   State<NewPossessionTabScreen> createState() => _NewPossessionTabScreenState();
@@ -442,15 +442,26 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
         if (jsondata['status'] == 'success') {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Insert Success")));
+          
         } else {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Insert Failed")));
         }
-        Navigator.pop(context);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+                builder: (context) => MainScreen(
+                      user: widget.user,
+                    )),
+          );
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Insert Failed")));
-        Navigator.pop(context);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+                builder: (context) => MainScreen(
+                      user: widget.user,
+                    )),
+          );
       }
     });
   }
