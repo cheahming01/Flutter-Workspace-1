@@ -8,6 +8,7 @@ if (!isset($_POST)) {
 include_once("dbconnect.php");
 
 $userid = $_POST['user_id'];
+$user_name = $_POST['user_name'];
 $possession_name = $_POST['possession_name'];
 $possession_desc = $_POST['possession_desc'];
 $possession_type = $_POST['possession_type'];
@@ -22,8 +23,9 @@ $cash_checked = $_POST['cash_checked'] == 'true' ? 1 : 0;
 $goods_checked = $_POST['goods_checked'] == 'true' ? 1 : 0;
 $services_checked = $_POST['services_checked'] == 'true' ? 1 : 0;
 $other_checked = $_POST['other_checked'] == 'true' ? 1 : 0;
+$publish = $_POST['publish'] == 'true' ? 1 : 0;
 
-$sqlinsert = "INSERT INTO `tbl_possessions`(`user_id`, `possession_name`, `possession_type`, `possession_desc`, `latitude`, `longitude`, `state`, `locality`, `date_owned`, `cash_checked`, `goods_checked`, `services_checked`, `other_checked`) VALUES ('$userid','$possession_name','$possession_type','$possession_desc','$latitude','$longitude','$state','$locality','$date_owned','$cash_checked','$goods_checked','$services_checked','$other_checked')";
+$sqlinsert = "INSERT INTO `tbl_possessions`(`user_id`, `user_name`, `possession_name`, `possession_type`, `possession_desc`, `latitude`, `longitude`, `state`, `locality`, `date_owned`, `cash_checked`, `goods_checked`, `services_checked`, `other_checked`, `publish`) VALUES ('$userid','$user_name','$possession_name','$possession_type','$possession_desc','$latitude','$longitude','$state','$locality','$date_owned','$cash_checked','$goods_checked','$services_checked','$other_checked','$publish')";
 
 if ($conn->query($sqlinsert) === TRUE) {
     $foldername = mysqli_insert_id($conn);

@@ -30,6 +30,7 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
   bool _services_checked = false;
   bool _other_checked = false;
   int _selectedImageIndex = 0;
+  bool _publish = false;
   final _formKey = GlobalKey<FormState>();
   late double screenHeight, screenWidth, cardwitdh;
   final TextEditingController _possessionnameEditingController =
@@ -57,6 +58,7 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
   void initState() {
     super.initState();
     _determinePosition();
+    print("Publish: $_publish");
     _date_owned = DateTime.now();
   }
 
@@ -137,7 +139,13 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
                       items: possessionlist.map((selectedType) {
                         return DropdownMenuItem(
                           value: selectedType,
-                          child: Text(selectedType),
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              selectedType,
+                              style: TextStyle(fontSize: 12.0),
+                            ),
+                          ),
                         );
                       }).toList(),
                       decoration: InputDecoration(
@@ -332,6 +340,10 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
                             child: ElevatedButton(
                               onPressed: () {
                                 insertDialog();
+                                setState(() {
+                                  _publish = true;
+                                });
+                                print("Publish: $_publish");
                               },
                               child: const Text("Publish"),
                             ),
@@ -377,6 +389,7 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
                 style: TextStyle(),
               ),
               onPressed: () {
+                print("Publish: $_publish");
                 Navigator.of(context).pop();
                 insertPossession();
                 Navigator.of(context).pushReplacement(
@@ -393,6 +406,10 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
                 style: TextStyle(),
               ),
               onPressed: () {
+                setState(() {
+                  _publish = false;
+                });
+                print("Publish: $_publish");
                 Navigator.of(context).pop();
               },
             ),
@@ -417,11 +434,13 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
       String base64Image = base64Encode(widget.images[i]!.readAsBytesSync());
       base64Images.add(base64Image);
     }
+    bool publish = _publish;
 
     http.post(
         Uri.parse("${MyConfig().SERVER}/barterit/php/insert_possession.php"),
         body: {
           "user_id": widget.user.id.toString(),
+          "user_name": widget.user.name.toString(),
           "possession_name": possessionname,
           "possession_desc": possessiondesc,
           "possession_type": selectedType,
@@ -435,33 +454,34 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
           "goods_checked": goods_checked.toString(),
           "services_checked": services_checked.toString(),
           "other_checked": other_checked.toString(),
+          "publish": publish.toString(),
         }).then((response) {
+      if (!mounted) return;
       print(response.body);
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == 'success') {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Insert Success")));
-          
         } else {
           ScaffoldMessenger.of(context)
               .showSnackBar(const SnackBar(content: Text("Insert Failed")));
         }
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-                builder: (context) => MainScreen(
-                      user: widget.user,
-                    )),
-          );
+          MaterialPageRoute(
+              builder: (context) => MainScreen(
+                    user: widget.user,
+                  )),
+        );
       } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(const SnackBar(content: Text("Insert Failed")));
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-                builder: (context) => MainScreen(
-                      user: widget.user,
-                    )),
-          );
+          MaterialPageRoute(
+              builder: (context) => MainScreen(
+                    user: widget.user,
+                  )),
+        );
       }
     });
   }

@@ -230,13 +230,13 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                 itemBuilder: (context, index) {
                   switch (index) {
                     case 0:
-                      return PublishedPage();
+                      return PublishedPage(user: widget.user);
                     case 1:
-                      return StoragePage();
+                      return StoragePage(user: widget.user);
                     case 2:
                       return HistoryPage();
                     default:
-                      return PublishedPage(); 
+                      return PublishedPage(user: widget.user); 
                   }
                 },
               ),

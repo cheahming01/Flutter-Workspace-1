@@ -198,14 +198,14 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
       sourcePath: _images[_selectedImageIndex]!.path,
       aspectRatioPresets: [
-        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.square,
       ],
       uiSettings: [
         AndroidUiSettings(
           toolbarTitle: 'Cropper',
           toolbarColor: Colors.deepOrange,
           toolbarWidgetColor: Colors.white,
-          initAspectRatio: CropAspectRatioPreset.ratio3x2,
+          initAspectRatio: CropAspectRatioPreset.square,
           lockAspectRatio: true,
         ),
         IOSUiSettings(

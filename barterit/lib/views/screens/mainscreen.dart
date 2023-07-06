@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 
 import '../../models/user.dart';
 import 'buyertabscreen.dart';
-import 'newpossessiontabscreen.dart';
 
 class MainScreen extends StatefulWidget {
   final User user;
@@ -100,7 +99,7 @@ class _MainScreenState extends State<MainScreen> {
             items: const [
               BottomNavigationBarItem(
                 icon: Icon(Icons.store_mall_directory),
-                label: "Shop",
+                label: "Market",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.person),

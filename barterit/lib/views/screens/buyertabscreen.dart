@@ -1,8 +1,9 @@
+import 'package:barterit/views/screens/buyerdetailscreen.dart';
+import 'package:barterit/views/screens/storagepage.dart';
 import 'package:flutter/material.dart';
 import 'package:barterit/models/user.dart';
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:barterit/models/possession.dart';
 import 'package:http/http.dart' as http;
@@ -22,13 +23,17 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
   String maintitle = "Buyer";
   List<Possession> possessionList = <Possession>[];
   late double screenHeight, screenWidth;
-  late int axiscount = 2;
+  late int axiscount = 1;
   TextEditingController searchController = TextEditingController();
+  int numofpage = 1, curpage = 1;
+  int numberofresult = 0;
+  var color;
+  int cartqty = 0;
 
   @override
   void initState() {
     super.initState();
-    loadPossessions();
+    loadPossessions(1);
     print("Buyer");
   }
 
@@ -42,11 +47,11 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    if (screenWidth > 600) {
-      axiscount = 3;
-    } else {
-      axiscount = 2;
-    }
+    // if (screenWidth > 600) {
+    //   axiscount = 3;
+    // } else {
+    //   axiscount = 2;
+    // }
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -67,6 +72,7 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                 children: [
                   Expanded(
                     child: TextField(
+                      controller: searchController,
                       decoration: InputDecoration(
                         hintText: "Search",
                         filled: true,
@@ -79,11 +85,18 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                             EdgeInsets.symmetric(vertical: 4, horizontal: 16),
                         prefixIcon: Icon(Icons.search),
                       ),
+                      onSubmitted: (search) {
+                        searchpossession(search);
+                      },
                     ),
                   ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(Icons.notifications),
+                  SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: () {
+                      loadPossessions(
+                          1); // Call the function to refresh and shuffle the list
+                    },
+                    child: Icon(Icons.refresh),
                   ),
                 ],
               ),
@@ -95,71 +108,180 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
           ? const Center(
               child: Text("No Data"),
             )
-          : Column(children: [
-              Container(
-                height: 24,
-                color: Theme.of(context).colorScheme.primary,
-                alignment: Alignment.center,
-                child: Text(
-                  "${possessionList.length} possessions Found",
-                  style: const TextStyle(color: Colors.white, fontSize: 18),
+          : Column(
+              children: [
+                Container(
+                  height: 24,
+                  color: Theme.of(context).colorScheme.primary,
+                  alignment: Alignment.center,
+                  child: Text(
+                    "$numberofresult possessions Found",
+                    style: const TextStyle(color: Colors.white, fontSize: 18),
+                  ),
                 ),
-              ),
-              Expanded(
+                SizedBox(
+                  height: 50,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: numofpage,
+                    scrollDirection: Axis.horizontal,
+                    itemBuilder: (context, index) {
+                      //build the list for textbutton with scroll
+                      if ((curpage - 1) == index) {
+                        //set current page number active
+                        color = Colors.red;
+                      } else {
+                        color = Colors.black;
+                      }
+                      return TextButton(
+                          onPressed: () {
+                            curpage = index + 1;
+                            loadPossessions(index + 1);
+                          },
+                          child: Text(
+                            (index + 1).toString(),
+                            style: TextStyle(color: color, fontSize: 18),
+                          ));
+                    },
+                  ),
+                ),
+                Expanded(
                   child: GridView.count(
-                      crossAxisCount: axiscount,
-                      children: List.generate(
-                        possessionList.length,
-                        (index) {
-                          return Card(
-                            child: InkWell(
-                              onTap: () {
-                                Possession userpossession =
-                                    Possession.fromJson(possessionList[index].toJson());
-                                // Navigator.push(
-                                //     context,
-                                //     MaterialPageRoute(
-                                //         builder: (content) =>
-                                //             SellerDetailsScreen(
-                                //               user: widget.user,
-                                //               userpossession: userpossession,
-                                //             )e
-                                //             ));
-                              },
-                              child: Column(children: [
-                                CachedNetworkImage(
-                                  width: screenWidth,
-                                  fit: BoxFit.cover,
-                                  imageUrl:
-                                      "${MyConfig().SERVER}/barterit/assets/possessions/${possessionList[index].possessionId}/1.png",
-                                  placeholder: (context, url) =>
-                                      const LinearProgressIndicator(),
-                                  errorWidget: (context, url, error) =>
-                                      const Icon(Icons.error),
-                                ),
-                                Text(
-                                  possessionList[index].possessionName.toString(),
-                                  style: const TextStyle(fontSize: 20),
-                                ),
-                                
-                              ]),
+                    crossAxisCount: 1,
+                    childAspectRatio: 3 / 1.6,
+                    children: List.generate(
+                      possessionList.length,
+                      (index) {
+                        return Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey,
+                              width: 1,
                             ),
-                          );
-                        },
-                      )))
-            ]),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    possessionList[index].userName.toString(),
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      Possession singlePossession =
+                                          Possession.fromJson(
+                                              possessionList[index].toJson());
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              BuyerDetailScreen(
+                                            user: widget.user,
+                                            userPossession: singlePossession,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: CachedNetworkImage(
+                                      height: screenWidth / 3,
+                                      width: screenWidth / 3,
+                                      imageUrl:
+                                          "${MyConfig().SERVER}/barterit/assets/possessions/${possessionList[index].possessionId}/1.png",
+                                      placeholder: (context, url) =>
+                                          const LinearProgressIndicator(),
+                                      errorWidget: (context, url, error) =>
+                                          const Icon(Icons.error),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Align(
+                                            alignment: Alignment.center,
+                                            child: Icon(Icons.swap_horiz),
+                                          ),
+                                        ),
+                                        GestureDetector(
+                                          onTap: () {
+                                            showModalBottomSheet(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.8,
+                                                  child: StoragePage(
+                                                      user: widget.user),
+                                                );
+                                              },
+                                            );
+                                          },
+                                          child: Container(
+                                            height: screenWidth / 3,
+                                            width: screenWidth / 3,
+                                            decoration: BoxDecoration(
+                                              border: Border.all(
+                                                color: Colors.black,
+                                                width: 1,
+                                              ),
+                                            ),
+                                            child: Image.asset(
+                                              "assets/images/logo.png",
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                possessionList[index].possessionName.toString(),
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
     );
   }
 
-  void loadPossessions() {
-    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
-        body: {}).then((response) {
-      //print(response.body);
+  void loadPossessions(int pg) {
+    http.post(
+        Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
+        body: {
+          "publish": true.toString(),
+          "pageno": pg.toString()
+        }).then((response) {
+      print(response.body);
       log(response.body);
       possessionList.clear();
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == "success") {
+          numofpage = int.parse(jsondata['numofpage']); //get number of pages
+          numberofresult = int.parse(jsondata['numberofresult']);
+          print(numofpage);
           var extractdata = jsondata['data'];
           extractdata['possessions'].forEach((v) {
             possessionList.add(Possession.fromJson(v));
@@ -171,55 +293,9 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
     });
   }
 
-  void showsearchDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.all(Radius.circular(10.0))),
-          title: const Text(
-            "Search?",
-            style: TextStyle(),
-          ),
-          content: Column(mainAxisSize: MainAxisSize.min, children: [
-            TextField(
-                controller: searchController,
-                decoration: const InputDecoration(
-                    labelText: 'Search',
-                    labelStyle: TextStyle(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(width: 2.0),
-                    ))),
-            const SizedBox(
-              height: 4,
-            ),
-            ElevatedButton(
-                onPressed: () {
-                  String search = searchController.text;
-                  searchpossession(search);
-                  Navigator.of(context).pop();
-                },
-                child: const Text("Search"))
-          ]),
-          actions: <Widget>[
-            TextButton(
-              child: const Text(
-                "Close",
-                style: TextStyle(),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void searchpossession(String search) {
-    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
+    http.post(
+        Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
         body: {"search": search}).then((response) {
       //print(response.body);
       log(response.body);
@@ -227,6 +303,9 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == "success") {
+          numofpage = int.parse(jsondata['numofpage']); //get number of pages
+          numberofresult = int.parse(jsondata['numberofresult']);
+          print(numofpage);
           var extractdata = jsondata['data'];
           extractdata['possessions'].forEach((v) {
             possessionList.add(Possession.fromJson(v));
@@ -238,6 +317,7 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
     });
   }
 }
+
 class MoneyBar extends StatelessWidget {
   const MoneyBar({Key? key}) : super(key: key);
 
