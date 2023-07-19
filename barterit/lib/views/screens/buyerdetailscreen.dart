@@ -1,13 +1,9 @@
-import 'dart:convert';
-
-import 'package:barterit/views/screens/storagepage.dart';
+import 'package:barterit/views/screens/barteroption.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:barterit/models/possession.dart';
 import 'package:barterit/models/user.dart';
 import 'package:barterit/myconfig.dart';
-import 'package:http/http.dart' as http;
 
 class BuyerDetailScreen extends StatefulWidget {
   final Possession userPossession;
@@ -27,11 +23,14 @@ class _BuyerDetailScreenState extends State<BuyerDetailScreen> {
   int currentIndex = 0;
   bool isBottomSheetVisible = false;
   double bottomSheetHeight = 0.0;
-
+  bool get isCurrentUser =>
+      widget.userPossession.userName.toString() == widget.user.name;
+  String ownerPossId = "";
   @override
   void initState() {
     super.initState();
     loadPossessionImages();
+    ownerPossId = widget.userPossession.possessionId.toString();
   }
 
   void loadPossessionImages() {
@@ -117,49 +116,61 @@ class _BuyerDetailScreenState extends State<BuyerDetailScreen> {
           Expanded(
             flex: 5,
             child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Text(
-                          widget.userPossession.possessionName!,
+              padding: const EdgeInsets.all(16.0),
+              child: ListView(
+                // Replace Column with ListView
+                children: [
+                  Row(
+                    children: [
+                      Text(
+                        widget.userPossession.possessionName!,
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Container(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: widget.userPossession.possessionType == 'Goods'
+                              ? Colors.yellow
+                              : Colors.red,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          widget.userPossession.possessionType!,
                           style: TextStyle(
                             color: Colors.black,
-                            fontSize: 24,
+                            fontSize: 12,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(width: 8),
-                        Container(
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            widget.userPossession.possessionType!,
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 8),
-                    Text(
-                      widget.userPossession.userName.toString(),
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
                       ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    widget.userPossession.userName.toString(),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
                     ),
-                    SizedBox(height: 16),
-                    Container(
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    "${DateTime.parse(widget.userPossession.dateOwned.toString()).day.toString().padLeft(2, '0')}/${DateTime.parse(widget.userPossession.dateOwned.toString()).month.toString().padLeft(2, '0')}/${DateTime.parse(widget.userPossession.dateOwned.toString()).year.toString().substring(2)}",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ClipRect(
+                    // Wrap the Container with ClipRect
+                    child: Container(
                       width: double.infinity,
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -175,23 +186,43 @@ class _BuyerDetailScreenState extends State<BuyerDetailScreen> {
                         ),
                       ),
                     ),
-                  ],
-                )),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
+      extendBody: true,
       bottomSheet: AnimatedContainer(
         duration: Duration(milliseconds: 200),
-        height: bottomSheetHeight,
+        height: MediaQuery.of(context).viewInsets.bottom > 0
+            ? MediaQuery.of(context).size.height -
+                MediaQuery.of(context).viewInsets.bottom
+            : bottomSheetHeight,
         color: Colors.white,
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.8,
-          child: StoragePage(user: widget.user),
+        child: MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          child: SingleChildScrollView(
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              child: BarterOption(user: widget.user, ownerPossId: ownerPossId),
+            ),
+          ),
         ),
       ),
       floatingActionButton: ElevatedButton(
         onPressed: () {
-          toggleBottomSheetVisibility();
+          if (widget.userPossession.userName == widget.user.name) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text("You cannot trade with your own possession."),
+              ),
+            );
+          } else {
+            toggleBottomSheetVisibility();
+          }
         },
         child: Text(
           'TRADE',

@@ -5,16 +5,17 @@ class Possession {
   String? possessionName;
   String? possessionType;
   String? possessionDesc;
-  String? possessionLat;
-  String? possessionLong;
-  String? possessionState;
-  String? possessionLocality;
-  DateTime? date_owned;
+  String? latitude;
+  String? longitude;
+  String? state;
+  String? locality;
+  DateTime? dateOwned;
   bool? cash_checked;
   bool? goods_checked;
   bool? services_checked;
   bool? other_checked;
   bool? publish;
+  bool? available;
 
   Possession({
     this.possessionId,
@@ -23,16 +24,17 @@ class Possession {
     this.possessionName,
     this.possessionType,
     this.possessionDesc,
-    this.possessionLat,
-    this.possessionLong,
-    this.possessionState,
-    this.possessionLocality,
-    this.date_owned,
+    this.latitude,
+    this.longitude,
+    this.state,
+    this.locality,
+    this.dateOwned,
     this.cash_checked,
     this.goods_checked,
     this.services_checked,
     this.other_checked,
     this.publish,
+    this.available,
   });
 
   Possession.fromJson(Map<String, dynamic> json) {
@@ -42,17 +44,20 @@ class Possession {
     possessionName = json['possession_name'];
     possessionType = json['possession_type'];
     possessionDesc = json['possession_desc'];
-    possessionLat = json['possession_lat'];
-    possessionLong = json['possession_long'];
-    possessionState = json['possession_state'];
-    possessionLocality = json['possession_locality'];
-    date_owned = json['possession_date'];
-    cash_checked = json['cash_checked'] == 1 ? true : false;
-    goods_checked = json['goods_checked'] == 1 ? true : false;
-    services_checked = json['services_checked'] == 1 ? true : false;
-    other_checked = json['other_checked'] == 1 ? true : false;
-    publish = json['publish'] == 1 ? true : false;
+    latitude = json['latitude'];
+    longitude = json['longitude'];
+    state = json['state'];
+    locality = json['locality'];
+    dateOwned = DateTime.parse(json['date_owned']);
+    cash_checked = json['cash_checked'];
+    goods_checked = json['goods_checked'];
+    services_checked = json['services_checked'];
+    other_checked = json['other_checked'];
+    publish = json['publish'];
+    available = json['available'];
   }
+
+  get possessionState => null;
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
@@ -62,16 +67,17 @@ class Possession {
     data['possession_name'] = possessionName;
     data['possession_type'] = possessionType;
     data['possession_desc'] = possessionDesc;
-    data['possession_lat'] = possessionLat;
-    data['possession_long'] = possessionLong;
-    data['possession_state'] = possessionState;
-    data['possession_locality'] = possessionLocality;
-    data['date_owned'] = date_owned;
-    data['cash_checked'] = cash_checked ?? false ? 1 : 0;
-    data['goods_checked'] = goods_checked ?? false ? 1 : 0;
-    data['services_checked'] = services_checked ?? false ? 1 : 0;
-    data['other_checked'] = other_checked ?? false ? 1 : 0;
-    data['publish'] = publish ?? false ? 1 : 0;
+    data['latitude'] = latitude;
+    data['longitude'] = longitude;
+    data['state'] = state;
+    data['locality'] = locality;
+    data['date_owned'] = dateOwned?.toIso8601String();
+    data['cash_checked'] = cash_checked;
+    data['goods_checked'] = services_checked;
+    data['services_checked'] = services_checked;
+    data['other_checked'] = other_checked;
+    data['publish'] = publish;
+    data['available'] = available;
     return data;
   }
 }

@@ -1,8 +1,8 @@
 // StoragePage.dart
 import 'dart:convert';
 import 'dart:developer';
+import 'package:barterit/views/screens/buyerdetailscreen.dart';
 import 'package:barterit/views/screens/editpossessionscreen.dart';
-import 'package:barterit/views/screens/imagepickerpage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:barterit/models/possession.dart';
@@ -52,7 +52,7 @@ class _StoragePageState extends State<StoragePage> {
     return Scaffold(
       body: possessionList.isEmpty
           ? const Center(
-              child: Text("No Data"),
+              child: Text("Your Storage Looks Empty Here."),
             )
           : Column(children: [
               Expanded(
@@ -64,20 +64,84 @@ class _StoragePageState extends State<StoragePage> {
                           return Card(
                             child: InkWell(
                               onLongPress: () {
-                                onDeleteDialog(index);
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title:
+                                          const Text('Modify your possession?'),
+                                      content: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          // Add additional content here if needed
+                                        ],
+                                      ),
+                                      actions: [
+                                        Row(
+                                          children: [
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                onPressed: () async {
+                                                  Navigator.pop(context);
+                                                  Possession singlePossession =
+                                                      Possession.fromJson(
+                                                          possessionList[index]
+                                                              .toJson());
+                                                  await Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (content) =>
+                                                          EditPossessionScreen(
+                                                        user: widget.user,
+                                                        userPossession:
+                                                            singlePossession,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.green,
+                                                  // Set button color to light blue
+                                                ),
+                                                child: const Text('Edit'),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: ElevatedButton(
+                                                onPressed: () {
+                                                  // Handle delete option
+                                                  Navigator.pop(context);
+                                                  onDeleteDialog(index);
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.red,
+                                                  // Set button color to red
+                                                ),
+                                                child: const Text('Delete'),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
                               },
                               onTap: () async {
-                                Possession singlepossession =
+                                Possession singlePossession =
                                     Possession.fromJson(
                                         possessionList[index].toJson());
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (content) =>
-                                            EditPossessionScreen(
-                                              user: widget.user,
-                                              userPossession: singlepossession,
-                                            )));
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (BuildContext context) =>
+                                        BuyerDetailScreen(
+                                      user: widget.user,
+                                      userPossession: singlePossession,
+                                    ),
+                                  ),
+                                );
                               },
                               child: Column(children: [
                                 CachedNetworkImage(
@@ -111,6 +175,7 @@ class _StoragePageState extends State<StoragePage> {
         body: {
           "userid": widget.user.id,
           "publish": false.toString(),
+          "available": false.toString(),
         }).then((response) {
       //print(response.body);
       log(response.body);
@@ -167,7 +232,8 @@ class _StoragePageState extends State<StoragePage> {
   }
 
   void deletepossession(int index) {
-    http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/delete_possession.php"),
+    http.post(
+        Uri.parse("${MyConfig().SERVER}/barterit/php/delete_possession.php"),
         body: {
           "userid": widget.user.id,
           "possessionid": possessionList[index].possessionId

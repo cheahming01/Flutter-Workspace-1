@@ -26,161 +26,167 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
     return WillPopScope(
-      onWillPop: () async{
-      User user = User(
-                id: "na",
-                name: "na",
-                phone: "na",
-                datereg: "na",
-                password: "na",
-                otp: "na");
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => MainScreen(user: user,)),
+      onWillPop: () async {
+        User user = User(
+            id: "na",
+            name: "na",
+            phone: "na",
+            datereg: "na",
+            password: "na",
+            otp: "na",
+            cash: "na");
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+              builder: (context) => MainScreen(
+                    user: user,
+                  )),
+        );
+        return false;
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text("User Registration"),
+          backgroundColor: Colors.transparent,
+          foregroundColor: Theme.of(context).colorScheme.secondary,
+          elevation: 0,
+        ),
+        body: SingleChildScrollView(
+          child: Column(children: [
+            // SvgPicture.asset(
+            //   "assets/images/signup.svg",
+            //   height: screenHeight * 0.35,
+            // ),
+            SizedBox(
+                height: screenHeight * 0.35,
+                width: screenWidth,
+                child: Image.asset(
+                  "assets/images/logo.png",
+                  fit: BoxFit.cover,
+                )),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Card(
+                elevation: 8,
+                child: Container(
+                  margin: const EdgeInsets.all(16),
+                  child: Column(children: [
+                    Form(
+                      key: _formKey,
+                      child: Column(children: [
+                        TextFormField(
+                            controller: _nameEditingController,
+                            validator: (val) => val!.isEmpty || (val.length < 5)
+                                ? "name must be longer than 5"
+                                : null,
+                            keyboardType: TextInputType.text,
+                            decoration: const InputDecoration(
+                                labelText: 'User Name',
+                                labelStyle: TextStyle(),
+                                icon: Icon(Icons.person),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 2.0),
+                                ))),
+                        TextFormField(
+                            keyboardType: TextInputType.phone,
+                            validator: (val) =>
+                                val!.isEmpty || (val.length < 10)
+                                    ? "phone must be longer or equal than 10"
+                                    : null,
+                            controller: _phoneEditingController,
+                            decoration: const InputDecoration(
+                                labelText: 'Phone',
+                                labelStyle: TextStyle(),
+                                icon: Icon(Icons.phone),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 2.0),
+                                ))),
+                        TextFormField(
+                            controller: _passEditingController,
+                            validator: (val) => val!.isEmpty || (val.length < 5)
+                                ? "password must be longer than 5"
+                                : null,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                                labelText: 'Password',
+                                labelStyle: TextStyle(),
+                                icon: Icon(Icons.lock),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 2.0),
+                                ))),
+                        TextFormField(
+                            controller: _pass2EditingController,
+                            validator: (val) => val!.isEmpty || (val.length < 5)
+                                ? "password must be longer than 5"
+                                : null,
+                            obscureText: true,
+                            decoration: const InputDecoration(
+                                labelText: 'Re-enter password',
+                                labelStyle: TextStyle(),
+                                icon: Icon(Icons.lock),
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(width: 2.0),
+                                ))),
+                        const SizedBox(
+                          height: 16,
+                        ),
+                        Row(
+                          children: [
+                            Checkbox(
+                              value: _isChecked,
+                              onChanged: (bool? value) {
+                                if (!_isChecked) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text(
+                                              "Terms have been read and accepted.")));
+                                }
+                                setState(() {
+                                  _isChecked = value!;
+                                });
+                              },
+                            ),
+                            GestureDetector(
+                              onTap: null,
+                              child: const Text('Agree with terms',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                            ),
+                            const SizedBox(
+                              width: 16,
+                            ),
+                            Expanded(
+                                child: ElevatedButton(
+                                    onPressed: onRegisterDialog,
+                                    child: const Text("Register")))
+                          ],
+                        )
+                      ]),
+                    )
+                  ]),
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            GestureDetector(
+              onTap: _goLogin,
+              child: const Text(
+                "Already Registered? Login",
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            const SizedBox(
+              height: 16,
+            ),
+          ]),
+        ),
+      ),
     );
-    return false;
-    },
-    child: Scaffold(
-      appBar: AppBar(
-        title: const Text("User Registration"),
-        backgroundColor: Colors.transparent,
-        foregroundColor: Theme.of(context).colorScheme.secondary,
-        elevation: 0,
-      ),
-      body: SingleChildScrollView(
-        child: Column(children: [
-          // SvgPicture.asset(
-          //   "assets/images/signup.svg",
-          //   height: screenHeight * 0.35,
-          // ),
-          SizedBox(
-              height: screenHeight * 0.35,
-              width: screenWidth,
-              child: Image.asset(
-                "assets/images/logo.png",
-                fit: BoxFit.cover,
-              )),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Card(
-              elevation: 8,
-              child: Container(
-                margin: const EdgeInsets.all(16),
-                child: Column(children: [
-                  Form(
-                    key: _formKey,
-                    child: Column(children: [
-                      TextFormField(
-                          controller: _nameEditingController,
-                          validator: (val) => val!.isEmpty || (val.length < 5)
-                              ? "name must be longer than 5"
-                              : null,
-                          keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                              labelText: 'User Name',
-                              labelStyle: TextStyle(),
-                              icon: Icon(Icons.person),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(width: 2.0),
-                              ))),
-                      TextFormField(
-                          keyboardType: TextInputType.phone,
-                          validator: (val) => val!.isEmpty || (val.length < 10)
-                              ? "phone must be longer or equal than 10"
-                              : null,
-                          controller: _phoneEditingController,
-                          decoration: const InputDecoration(
-                              labelText: 'Phone',
-                              labelStyle: TextStyle(),
-                              icon: Icon(Icons.phone),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(width: 2.0),
-                              ))),
-                      TextFormField(
-                          controller: _passEditingController,
-                          validator: (val) => val!.isEmpty || (val.length < 5)
-                              ? "password must be longer than 5"
-                              : null,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                              labelText: 'Password',
-                              labelStyle: TextStyle(),
-                              icon: Icon(Icons.lock),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(width: 2.0),
-                              ))),
-                      TextFormField(
-                          controller: _pass2EditingController,
-                          validator: (val) => val!.isEmpty || (val.length < 5)
-                              ? "password must be longer than 5"
-                              : null,
-                          obscureText: true,
-                          decoration: const InputDecoration(
-                              labelText: 'Re-enter password',
-                              labelStyle: TextStyle(),
-                              icon: Icon(Icons.lock),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(width: 2.0),
-                              ))),
-                      const SizedBox(
-                        height: 16,
-                      ),
-                      Row(
-                        children: [
-                          Checkbox(
-                            value: _isChecked,
-                            onChanged: (bool? value) {
-                              if (!_isChecked) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: Text(
-                                            "Terms have been read and accepted.")));
-                              }
-                              setState(() {
-                                _isChecked = value!;
-                              });
-                            },
-                          ),
-                          GestureDetector(
-                            onTap: null,
-                            child: const Text('Agree with terms',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                )),
-                          ),
-                          const SizedBox(
-                            width: 16,
-                          ),
-                          Expanded(
-                              child: ElevatedButton(
-                                  onPressed: onRegisterDialog,
-                                  child: const Text("Register")))
-                        ],
-                      )
-                    ]),
-                  )
-                ]),
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 8,
-          ),
-          GestureDetector(
-            onTap: _goLogin,
-            child: const Text(
-              "Already Registered? Login",
-              style: TextStyle(
-                fontSize: 18,
-              ),
-            ),
-          ),
-          const SizedBox(
-            height: 16,
-          ),
-        ]),
-      ),
-    ),);
   }
 
   void onRegisterDialog() {

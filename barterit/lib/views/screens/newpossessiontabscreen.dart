@@ -435,6 +435,7 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
       base64Images.add(base64Image);
     }
     bool publish = _publish;
+    bool available = true;
 
     http.post(
         Uri.parse("${MyConfig().SERVER}/barterit/php/insert_possession.php"),
@@ -455,6 +456,7 @@ class _NewPossessionTabScreenState extends State<NewPossessionTabScreen> {
           "services_checked": services_checked.toString(),
           "other_checked": other_checked.toString(),
           "publish": publish.toString(),
+          "available": available.toString(),
         }).then((response) {
       if (!mounted) return;
       print(response.body);

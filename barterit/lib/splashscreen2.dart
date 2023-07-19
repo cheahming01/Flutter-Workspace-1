@@ -35,8 +35,8 @@ class SplashScreen2State extends State<SplashScreen2> {
         Container(
             decoration: const BoxDecoration(
                 image: DecorationImage(
-                    image: AssetImage('assets/images/balance.png'),
-                    ))),
+          image: AssetImage('assets/images/balance.png'),
+        ))),
         const Padding(
           padding: EdgeInsets.fromLTRB(0, 50, 0, 20),
           child: Column(
@@ -72,8 +72,7 @@ class SplashScreen2State extends State<SplashScreen2> {
     late User user;
     if (ischeck) {
       try {
-        http.post(
-            Uri.parse("${MyConfig().SERVER}/barterit/php/login_user.php"),
+        http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/login_user.php"),
             body: {"name": name, "password": password}).then((response) {
           if (response.statusCode == 200) {
             var jsondata = jsonDecode(response.body);
@@ -91,7 +90,8 @@ class SplashScreen2State extends State<SplashScreen2> {
                 phone: "na",
                 datereg: "na",
                 password: "na",
-                otp: "na");
+                otp: "na",
+                cash: "na");
             Timer(
                 const Duration(seconds: 3),
                 () => Navigator.pushReplacement(
@@ -112,7 +112,8 @@ class SplashScreen2State extends State<SplashScreen2> {
           phone: "na",
           datereg: "na",
           password: "na",
-          otp: "na");
+          otp: "na",
+          cash: "na");
       Timer(
           const Duration(seconds: 3),
           () => Navigator.pushReplacement(context,

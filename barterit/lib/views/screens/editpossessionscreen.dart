@@ -2,8 +2,6 @@ import 'dart:convert';
 import 'package:barterit/views/screens/mainscreen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:barterit/models/user.dart';
 import 'package:http/http.dart' as http;
 import 'package:barterit/myconfig.dart';
@@ -48,7 +46,6 @@ class _EditPossessionScreenState extends State<EditPossessionScreen> {
     "Services",
     "Other",
   ];
-  late Position _currentPosition;
 
   String curaddress = "";
   String curstate = "";
@@ -62,20 +59,14 @@ class _EditPossessionScreenState extends State<EditPossessionScreen> {
         widget.userPossession.possessionName.toString();
     _possessiondescEditingController.text =
         widget.userPossession.possessionDesc.toString();
-    _prstateEditingController.text =
-        widget.userPossession.possessionState.toString();
-    _prlocalEditingController.text =
-        widget.userPossession.possessionLocality.toString();
+    _prstateEditingController.text = widget.userPossession.state.toString();
+    _prlocalEditingController.text = widget.userPossession.locality.toString();
     selectedType = widget.userPossession.possessionType.toString();
-    if (widget.userPossession.date_owned != null) {
-      _date_owned = DateTime.parse(widget.userPossession.date_owned.toString());
+    if (widget.userPossession.dateOwned != null) {
+      _date_owned = DateTime.parse(widget.userPossession.dateOwned.toString());
     } else {
-      // Handle the situation when the date is null
-      // You can assign a default value or handle it based on your requirements
-      _date_owned =
-          DateTime.now(); // Assign the current date as a default value
+      _date_owned = DateTime.now();
     }
-
     _cash_checked = widget.userPossession.cash_checked ?? false;
     _goods_checked = widget.userPossession.goods_checked ?? false;
     _services_checked = widget.userPossession.services_checked ?? false;
@@ -437,8 +428,6 @@ class _EditPossessionScreenState extends State<EditPossessionScreen> {
   void updatePossession() {
     String possessionname = _possessionnameEditingController.text;
     String possessiondesc = _possessiondescEditingController.text;
-    String state = _prstateEditingController.text;
-    String locality = _prlocalEditingController.text;
     String date_owned = DateFormat('yyyy-MM-dd').format(_date_owned);
     bool cash_checked = _cash_checked;
     bool goods_checked = _goods_checked;
@@ -453,10 +442,6 @@ class _EditPossessionScreenState extends State<EditPossessionScreen> {
           "possession_desc": possessiondesc,
           "possession_type": selectedType,
           "date_owned": date_owned,
-          "latitude": prlat,
-          "longitude": prlong,
-          "state": state,
-          "locality": locality,
           "cash_checked": cash_checked.toString(),
           "goods_checked": goods_checked.toString(),
           "services_checked": services_checked.toString(),

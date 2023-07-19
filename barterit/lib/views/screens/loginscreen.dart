@@ -41,7 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 phone: "na",
                 datereg: "na",
                 password: "na",
-                otp: "na");
+                otp: "na",
+                cash: "na");
       Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => MainScreen(user: user,)),
     );

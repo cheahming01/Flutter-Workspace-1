@@ -1,5 +1,5 @@
+import 'package:barterit/views/screens/barteroption.dart';
 import 'package:barterit/views/screens/buyerdetailscreen.dart';
-import 'package:barterit/views/screens/storagepage.dart';
 import 'package:flutter/material.dart';
 import 'package:barterit/models/user.dart';
 import 'dart:convert';
@@ -9,7 +9,7 @@ import 'package:barterit/models/possession.dart';
 import 'package:http/http.dart' as http;
 import 'package:barterit/myconfig.dart';
 
-//for buyer screen
+// for buyer screen
 
 class BuyerTabScreen extends StatefulWidget {
   final User user;
@@ -29,29 +29,39 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
   int numberofresult = 0;
   var color;
   int cartqty = 0;
+  String ownerPossId = "";
+
+  late ScrollController _scrollController;
+  bool isLoading = false;
+  bool reachedEndOfList = false;
 
   @override
   void initState() {
     super.initState();
+    _scrollController = ScrollController()..addListener(_scrollListener);
     loadPossessions(1);
     print("Buyer");
   }
 
   @override
   void dispose() {
+    _scrollController.dispose();
     super.dispose();
     print("dispose");
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+            _scrollController.position.maxScrollExtent &&
+        !isLoading) {
+      loadMorePossessions();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
-    // if (screenWidth > 600) {
-    //   axiscount = 3;
-    // } else {
-    //   axiscount = 2;
-    // }
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(100),
@@ -60,8 +70,8 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Barter It"),
-              MoneyBar(),
+              Text("Barter It🤝"),
+              MoneyBar(user: widget.user),
             ],
           ),
           bottom: PreferredSize(
@@ -86,15 +96,13 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                         prefixIcon: Icon(Icons.search),
                       ),
                       onSubmitted: (search) {
-                        searchpossession(search);
+                        searchPossession(search);
                       },
                     ),
                   ),
-                  SizedBox(width: 8),
                   GestureDetector(
                     onTap: () {
-                      loadPossessions(
-                          1); // Call the function to refresh and shuffle the list
+                      loadPossessions(1, clearList: true);
                     },
                     child: Icon(Icons.refresh),
                   ),
@@ -119,39 +127,16 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                     style: const TextStyle(color: Colors.white, fontSize: 18),
                   ),
                 ),
-                SizedBox(
-                  height: 50,
-                  child: ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: numofpage,
-                    scrollDirection: Axis.horizontal,
-                    itemBuilder: (context, index) {
-                      //build the list for textbutton with scroll
-                      if ((curpage - 1) == index) {
-                        //set current page number active
-                        color = Colors.red;
-                      } else {
-                        color = Colors.black;
-                      }
-                      return TextButton(
-                          onPressed: () {
-                            curpage = index + 1;
-                            loadPossessions(index + 1);
-                          },
-                          child: Text(
-                            (index + 1).toString(),
-                            style: TextStyle(color: color, fontSize: 18),
-                          ));
-                    },
-                  ),
-                ),
                 Expanded(
-                  child: GridView.count(
-                    crossAxisCount: 1,
-                    childAspectRatio: 3 / 1.6,
-                    children: List.generate(
-                      possessionList.length,
-                      (index) {
+                  child: GridView.builder(
+                    controller: _scrollController,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 1,
+                      childAspectRatio: 3 / 1.6,
+                    ),
+                    itemCount: possessionList.length + 1,
+                    itemBuilder: (context, index) {
+                      if (index < possessionList.length) {
                         return Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
@@ -216,32 +201,135 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                                         ),
                                         GestureDetector(
                                           onTap: () {
-                                            showModalBottomSheet(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return Container(
-                                                  height: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.8,
-                                                  child: StoragePage(
-                                                      user: widget.user),
-                                                );
-                                              },
-                                            );
+                                            if (possessionList[index]
+                                                    .userName ==
+                                                widget.user.name) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                      "You cannot trade with your own possession."),
+                                                ),
+                                              );
+                                            } else {
+                                              showModalBottomSheet(
+                                                context: context,
+                                                builder:
+                                                    (BuildContext context) {
+                                                  return Container(
+                                                    height:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
+                                                            0.8,
+                                                    child: BarterOption(
+                                                        user: widget.user,
+                                                        ownerPossId: possessionList[
+                                                                    index]
+                                                                .possessionId ??
+                                                            ''),
+                                                  );
+                                                },
+                                              );
+                                            }
                                           },
-                                          child: Container(
-                                            height: screenWidth / 3,
-                                            width: screenWidth / 3,
-                                            decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: Colors.black,
-                                                width: 1,
+                                          child: Stack(
+                                            alignment: Alignment.center,
+                                            children: [
+                                              Container(
+                                                height: screenWidth / 3,
+                                                width: screenWidth / 3,
+                                                decoration: BoxDecoration(
+                                                  border: Border.all(
+                                                    color: Colors.black,
+                                                    width: 1,
+                                                  ),
+                                                ),
+                                                child: Image.asset(
+                                                  "assets/images/barterOption.jpg",
+                                                ),
                                               ),
-                                            ),
-                                            child: Image.asset(
-                                              "assets/images/logo.png",
-                                            ),
+                                              Positioned(
+                                                bottom: 10,
+                                                child: Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    if (possessionList[index]
+                                                            .cash_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      Container(
+                                                        width: 10,
+                                                        height: 10,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.green,
+                                                        ),
+                                                      ),
+                                                    if (possessionList[index]
+                                                            .goods_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      SizedBox(width: 10),
+                                                    if (possessionList[index]
+                                                            .goods_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      Container(
+                                                        width: 10,
+                                                        height: 10,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.yellow,
+                                                        ),
+                                                      ),
+                                                    if (possessionList[index]
+                                                            .services_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      SizedBox(width: 10),
+                                                    if (possessionList[index]
+                                                            .services_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      Container(
+                                                        width: 10,
+                                                        height: 10,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.orange,
+                                                        ),
+                                                      ),
+                                                    if (possessionList[index]
+                                                            .other_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      SizedBox(width: 10),
+                                                    if (possessionList[index]
+                                                            .other_checked
+                                                            .toString() ==
+                                                        "true")
+                                                      Container(
+                                                        width: 10,
+                                                        height: 10,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          shape:
+                                                              BoxShape.circle,
+                                                          color: Colors.red,
+                                                        ),
+                                                      ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -257,8 +345,19 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
                             ],
                           ),
                         );
-                      },
-                    ),
+                      } else {
+                        if (reachedEndOfList) {
+                          return Center(
+                            child: Text(
+                              "You have reached the end of the list",
+                              style: TextStyle(fontSize: 16),
+                            ),
+                          );
+                        } else {
+                          return Center(child: CircularProgressIndicator());
+                        }
+                      }
+                    },
                   ),
                 ),
               ],
@@ -266,16 +365,24 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
     );
   }
 
-  void loadPossessions(int pg) {
-    http.post(
-        Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
-        body: {
-          "publish": true.toString(),
-          "pageno": pg.toString()
-        }).then((response) {
+  void loadPossessions(int pg, {bool loadMore = false, bool clearList = true}) {
+    if (loadMore) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final params = {
+      "publish": true.toString(),
+      "available": true.toString(),
+      "pageno": pg.toString(),
+    };
+    http
+        .post(
+            Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
+            body: params)
+        .then((response) {
       print(response.body);
       log(response.body);
-      possessionList.clear();
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == "success") {
@@ -283,23 +390,40 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
           numberofresult = int.parse(jsondata['numberofresult']);
           print(numofpage);
           var extractdata = jsondata['data'];
+          List<dynamic> possessionData = extractdata['possessions'];
+          possessionData.shuffle();
+          if (clearList) possessionList.clear();
           extractdata['possessions'].forEach((v) {
             possessionList.add(Possession.fromJson(v));
           });
           print(possessionList[0].possessionName);
         }
         setState(() {});
+      }
+      if (loadMore) {
+        setState(() {
+          isLoading = false;
+        });
       }
     });
   }
 
-  void searchpossession(String search) {
-    http.post(
-        Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
-        body: {"search": search}).then((response) {
-      //print(response.body);
+  void searchPossession(String search,
+      {bool loadMore = false, bool clearList = true}) {
+    if (loadMore) {
+      setState(() {
+        isLoading = true;
+      });
+    }
+    final params = {
+      "search": search,
+    };
+    http
+        .post(
+            Uri.parse("${MyConfig().SERVER}/barterit/php/load_possessions.php"),
+            body: params)
+        .then((response) {
       log(response.body);
-      possessionList.clear();
       if (response.statusCode == 200) {
         var jsondata = jsonDecode(response.body);
         if (jsondata['status'] == "success") {
@@ -307,6 +431,7 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
           numberofresult = int.parse(jsondata['numberofresult']);
           print(numofpage);
           var extractdata = jsondata['data'];
+          if (clearList) possessionList.clear();
           extractdata['possessions'].forEach((v) {
             possessionList.add(Possession.fromJson(v));
           });
@@ -314,12 +439,29 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
         }
         setState(() {});
       }
+      if (loadMore) {
+        setState(() {
+          isLoading = false;
+        });
+      }
     });
+  }
+
+  void loadMorePossessions() {
+    if (!isLoading && curpage < numofpage) {
+      curpage++;
+      loadPossessions(curpage, loadMore: true, clearList: false);
+    } else {
+      setState(() {
+        reachedEndOfList = true;
+      });
+    }
   }
 }
 
 class MoneyBar extends StatelessWidget {
-  const MoneyBar({Key? key}) : super(key: key);
+  final User user;
+  const MoneyBar({Key? key, required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -339,7 +481,8 @@ class MoneyBar extends StatelessWidget {
           ),
           SizedBox(width: 5),
           Text(
-            "0",
+            user.cash ??
+                '0', // Access the user.cash property with a fallback value
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

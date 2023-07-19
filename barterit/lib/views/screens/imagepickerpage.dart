@@ -89,7 +89,7 @@ class _ImagePickerPageState extends State<ImagePickerPage> {
     screenWidth = MediaQuery.of(context).size.width;
     cardwidth = screenWidth / 3;
     
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       // Show login dialog after the frame is rendered
       if (loginRequired) {
         showLoginDialog();

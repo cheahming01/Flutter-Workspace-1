@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Barter It',
+      title: 'Barter It🤝',
       theme: ThemeData(
         primarySwatch: Colors.blue,
         textTheme: GoogleFonts.aBeeZeeTextTheme(

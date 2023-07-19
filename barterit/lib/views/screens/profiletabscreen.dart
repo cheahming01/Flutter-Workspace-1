@@ -87,7 +87,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
     screenHeight = MediaQuery.of(context).size.height;
     screenWidth = MediaQuery.of(context).size.width;
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       // Show login dialog after the frame is rendered
       if (loginRequired) {
         showLoginDialog();
@@ -234,7 +234,7 @@ class _ProfileTabScreenState extends State<ProfileTabScreen> {
                     case 1:
                       return StoragePage(user: widget.user);
                     case 2:
-                      return HistoryPage();
+                      return HistoryPage(user: widget.user);
                     default:
                       return PublishedPage(user: widget.user); 
                   }
