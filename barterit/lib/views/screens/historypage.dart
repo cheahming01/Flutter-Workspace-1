@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:barterit/models/request.dart';
 import 'package:barterit/views/screens/buyerdetailscreen.dart';
-import 'package:barterit/views/screens/reqoption.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:barterit/models/user.dart';
@@ -265,34 +264,34 @@ class _HistoryPageState extends State<HistoryPage> {
                                                     },
                                                   );
                                                 } else {
-                                                  showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return AlertDialog(
-                                                        title: Text(
-                                                            'Cancel Request'),
-                                                        content: Text(
-                                                            'Are you sure you want to cancel the request?'),
-                                                        actions: [
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              deleteRequest(
-                                                                  request);
-                                                              Navigator.pop(
-                                                                  context); // Close the dialog
-                                                            },
-                                                            child: Text('Yes'),
-                                                          ),
-                                                          TextButton(
-                                                            onPressed: () {
-                                                              Navigator.pop(
-                                                                  context); // Close the dialog
-                                                            },
-                                                            child: Text('No'),
-                                                          ),
-                                                        ],
-                                                      );
+                                                showDialog(
+                                                  context: context,
+                                                  builder:
+                                                      (BuildContext context) {
+                                                    return AlertDialog(
+                                                      title: Text(
+                                                          'Cancel Request'),
+                                                      content: Text(
+                                                          'Are you sure you want to cancel the request?'),
+                                                      actions: [
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            deleteRequest(
+                                                                request);
+                                                            Navigator.pop(
+                                                                context); // Close the dialog
+                                                          },
+                                                          child: Text('Yes'),
+                                                        ),
+                                                        TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                                context); // Close the dialog
+                                                          },
+                                                          child: Text('No'),
+                                                        ),
+                                                      ],
+                                                    );
                                                     },
                                                   );
                                                 }

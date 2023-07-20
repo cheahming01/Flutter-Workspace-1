@@ -1,5 +1,6 @@
 import 'package:barterit/views/screens/barteroption.dart';
 import 'package:barterit/views/screens/buyerdetailscreen.dart';
+import 'package:barterit/views/screens/topupscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:barterit/models/user.dart';
 import 'dart:convert';
@@ -461,34 +462,45 @@ class _BuyerTabScreenState extends State<BuyerTabScreen> {
 
 class MoneyBar extends StatelessWidget {
   final User user;
+
   const MoneyBar({Key? key, required this.user}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 80,
-      height: 40,
-      decoration: BoxDecoration(
-        color: Colors.green,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            Icons.attach_money,
-            color: Colors.white,
-          ),
-          SizedBox(width: 5),
-          Text(
-            user.cash ??
-                '0', // Access the user.cash property with a fallback value
-            style: TextStyle(
+    return GestureDetector(
+      onTap: () {
+        // Navigate to the topup.dart screen here
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) =>
+                  TopUpScreen(user: user)), // Replace 'TopUpScreen' with the actual name of your topup screen class.
+        );
+      },
+      child: Container(
+        width: 80,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.green,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.attach_money,
               color: Colors.white,
-              fontWeight: FontWeight.bold,
             ),
-          ),
-        ],
+            SizedBox(width: 5),
+            Text(
+              user.cash ?? '0',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

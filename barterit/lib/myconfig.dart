@@ -1,3 +1,3 @@
 class MyConfig {
-  String SERVER = "http://generationz3.com";
+  String SERVER = "https://generationz3.com";
 }

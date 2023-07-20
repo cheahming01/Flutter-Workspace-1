@@ -70,6 +70,7 @@ class SplashScreen2State extends State<SplashScreen2> {
     String password = (prefs.getString('pass')) ?? '';
     bool ischeck = (prefs.getBool('checkbox')) ?? false;
     late User user;
+
     if (ischeck) {
       try {
         http.post(Uri.parse("${MyConfig().SERVER}/barterit/php/login_user.php"),
