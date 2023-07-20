@@ -26,7 +26,7 @@ class _BarterOptionState extends State<BarterOption> {
   String maintitle = "Storage";
   List<Possession> possessionList = <Possession>[];
   final _cashInputController = TextEditingController();
-  late int selectedIndex = -1; // Holds the index of the selected possession
+  late int selectedIndex = -1;
 
   @override
   void initState() {
@@ -37,6 +37,7 @@ class _BarterOptionState extends State<BarterOption> {
 
   @override
   void dispose() {
+    // Set the flag to false during disposal
     _cashInputController.dispose();
     super.dispose();
     print("dispose");
@@ -234,7 +235,7 @@ class _BarterOptionState extends State<BarterOption> {
     );
   }
 
-  void reqTrade(String cashInput, String userPossId) {
+  void reqTrade(String cashInput, String userPossId) async {
     http.post(
       Uri.parse("${MyConfig().SERVER}/barterit/php/insert_request.php"),
       body: {
@@ -289,6 +290,7 @@ class _BarterOptionState extends State<BarterOption> {
         body: {
           "userid": widget.user.id,
           "publish": false.toString(),
+          "available": false.toString(),
         }).then((response) {
       //print(response.body);
       log(response.body);
