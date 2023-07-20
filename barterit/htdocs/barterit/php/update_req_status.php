@@ -7,16 +7,16 @@ if (!isset($_POST)) {
 
 include_once("dbconnect.php");
 
-$name = $_POST['name'];
-$password = sha1($_POST['password']);
-$phone = $_POST['phone'];
-$otp = rand(10000,99999);
-$cash = 0;
+// Retrieve the request ID and status from the POST request
+$reqId = $_POST['reqid'];
+$status = $_POST['status'];
 
-$sqlinsert = "INSERT INTO `tbl_users`(`user_name`, `user_password`, `user_phone`,`otp`,`cash`) VALUES ('$name','$password','$phone','$otp','$cash')";
+// Update the status in the database
+$sqlupdate = "UPDATE `tbl_request` SET `status` = '$status' WHERE `req_id` = '$reqId'";
 
-if ($conn->query($sqlinsert) === TRUE) {
-	$response = array('status' => 'success', 'data' => null);
+
+if ($conn->query($sqlupdate) === TRUE) {
+	$response = array('status' => 'success', 'data' => $sqlupdate);
     sendJsonResponse($response);
 }else{
 	$response = array('status' => 'failed', 'data' => null);

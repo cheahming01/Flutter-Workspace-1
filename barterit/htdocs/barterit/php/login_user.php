@@ -22,6 +22,7 @@ if ($result->num_rows > 0) {
 		$userarray['phone'] = $row['user_phone'];
         $userarray['datereg'] = $row['user_datereg'];
 		$userarray['otp'] = $row['otp'];
+		$userarray['cash'] = $row['cash'];
 		$response = array('status' => 'success', 'data' => $userarray);
 		sendJsonResponse($response);
 	}

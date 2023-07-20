@@ -1,0 +1,1 @@
+[20-Jul-2023 06:57:44 UTC] PHP Warning:  file_put_contents(../assets/profileimages/2.png): failed to open stream: No such file or directory in /home4/generati/public_html/barterit/php/update_profile.php on line 14

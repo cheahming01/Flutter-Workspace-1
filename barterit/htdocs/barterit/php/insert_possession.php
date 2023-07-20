@@ -24,8 +24,9 @@ $goods_checked = $_POST['goods_checked'] == 'true' ? 1 : 0;
 $services_checked = $_POST['services_checked'] == 'true' ? 1 : 0;
 $other_checked = $_POST['other_checked'] == 'true' ? 1 : 0;
 $publish = $_POST['publish'] == 'true' ? 1 : 0;
+$available = $_POST['available'] == 'true' ? 1 : 0;
 
-$sqlinsert = "INSERT INTO `tbl_possessions`(`user_id`, `user_name`, `possession_name`, `possession_type`, `possession_desc`, `latitude`, `longitude`, `state`, `locality`, `date_owned`, `cash_checked`, `goods_checked`, `services_checked`, `other_checked`, `publish`) VALUES ('$userid','$user_name','$possession_name','$possession_type','$possession_desc','$latitude','$longitude','$state','$locality','$date_owned','$cash_checked','$goods_checked','$services_checked','$other_checked','$publish')";
+$sqlinsert = "INSERT INTO `tbl_possessions`(`user_id`, `user_name`, `possession_name`, `possession_type`, `possession_desc`, `latitude`, `longitude`, `state`, `locality`, `date_owned`, `cash_checked`, `goods_checked`, `services_checked`, `other_checked`, `publish`, `available`) VALUES ('$userid','$user_name','$possession_name','$possession_type','$possession_desc','$latitude','$longitude','$state','$locality','$date_owned','$cash_checked','$goods_checked','$services_checked','$other_checked','$publish','$available')";
 
 if ($conn->query($sqlinsert) === TRUE) {
     $foldername = mysqli_insert_id($conn);

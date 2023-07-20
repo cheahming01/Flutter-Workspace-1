@@ -7,16 +7,19 @@ if (!isset($_POST)) {
 
 include_once("dbconnect.php");
 
-$name = $_POST['name'];
-$password = sha1($_POST['password']);
-$phone = $_POST['phone'];
-$otp = rand(10000,99999);
-$cash = 0;
 
-$sqlinsert = "INSERT INTO `tbl_users`(`user_name`, `user_password`, `user_phone`,`otp`,`cash`) VALUES ('$name','$password','$phone','$otp','$cash')";
+$userId = $_POST['userId'];
+$cashInput = $_POST['cashInput'];
+$ownerPossId = $_POST['ownerPossId'];
+$userPossId = $_POST['userPossId'];
+$status = $_POST['status'];
+
+
+// Insert data into tbl_request
+$sqlinsert = "INSERT INTO `tbl_request`(`user_id`, `cash_input`, `owner_poss_id`,`user_poss_id`,`status`) VALUES ('$userId','$cashInput','$ownerPossId','$userPossId','$status')";
 
 if ($conn->query($sqlinsert) === TRUE) {
-	$response = array('status' => 'success', 'data' => null);
+	$response = array('status' => 'success', 'data' => $sqlinsert);
     sendJsonResponse($response);
 }else{
 	$response = array('status' => 'failed', 'data' => null);
